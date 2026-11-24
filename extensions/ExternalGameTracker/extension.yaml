@@ -1,0 +1,9 @@
+Id: ExternalGameTracker_6f982b13-054d-44a6-b51c-81b4d0eb38c9
+Name: External Game Tracker
+Author: Flavio
+Version: 1.0.0
+Module: ExternalGameTracker.dll
+Type: GenericPlugin
+Links:
+  - Name: GitHub
+    Url: https://github.com
