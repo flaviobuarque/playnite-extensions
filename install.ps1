@@ -21,7 +21,16 @@ $ErrorActionPreference = "Stop"
 # URLs oficiais de releases
 $RepoOwner = "flaviobuarque"
 $RepoName = "playnite-extensions"
-$BaseReleaseUrl = "https://github.com/$RepoOwner/$RepoName/releases/download/latest"
+$LatestReleaseApi = "https://api.github.com/repos/$RepoOwner/$RepoName/releases/latest"
+$script:CachedRelease = $null
+
+function Get-LatestReleaseInfo {
+    if (-not $script:CachedRelease) {
+        Write-Host "Consultando última release no GitHub..." -ForegroundColor DarkGray
+        $script:CachedRelease = Invoke-RestMethod -Uri $LatestReleaseApi -UseBasicParsing
+    }
+    return $script:CachedRelease
+}
 
 function Write-Banner {
     Clear-Host
@@ -79,17 +88,21 @@ function Install-ExternalGameTracker([string]$playnitePath, [string]$tempDir) {
     $targetDir = "$playnitePath\Extensions\$extPluginId"
     New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
 
-    # Verifica se existe pacote local ou baixa da release
-    $localPext = "$PSScriptRoot\releases\ExternalGameTracker_1.0.0.pext"
+    # Verifica se existe pacote local (quando executado do repositório) ou baixa da última release
+    $localPext = if ($PSScriptRoot) { Get-ChildItem -Path "$PSScriptRoot\releases" -Filter "ExternalGameTracker*.pext" -ErrorAction SilentlyContinue | Select-Object -First 1 } else { $null }
     $downloadFile = "$tempDir\ExternalGameTracker.pext"
 
-    if (Test-Path $localPext) {
-        Write-Host "Usando arquivo compilado local..." -ForegroundColor DarkGray
-        Copy-Item -Path $localPext -Destination $downloadFile -Force
+    if ($localPext) {
+        Write-Host "Usando arquivo compilado local: $($localPext.Name)" -ForegroundColor DarkGray
+        Copy-Item -Path $localPext.FullName -Destination $downloadFile -Force
     } else {
-        $url = "$BaseReleaseUrl/ExternalGameTracker_1.0.0.pext"
-        Write-Host "Baixando da release: $url" -ForegroundColor DarkGray
-        Invoke-WebRequest -Uri $url -OutFile $downloadFile -UseBasicParsing
+        $release = Get-LatestReleaseInfo
+        $asset = $release.assets | Where-Object { $_.name -like "ExternalGameTracker*.pext" } | Select-Object -First 1
+        if (-not $asset) {
+            throw "Nenhum pacote .pext encontrado na última release ($($release.tag_name))."
+        }
+        Write-Host "Baixando release $($release.tag_name): $($asset.browser_download_url)" -ForegroundColor DarkGray
+        Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $downloadFile -UseBasicParsing
     }
 
     # Descompacta o .pext (zip) no diretório de extensões
@@ -107,20 +120,24 @@ function Install-HeliumTheme([string]$playnitePath, [string]$tempDir) {
     New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
 
     # Se estiver executando localmente e tiver a pasta themes/Helium
-    $localThemeDir = "$PSScriptRoot\themes\Helium"
-    $localThemeZip = "$PSScriptRoot\releases\Helium-Custom-Theme.zip"
+    $localThemeDir = if ($PSScriptRoot) { "$PSScriptRoot\themes\Helium" } else { $null }
+    $localThemeZip = if ($PSScriptRoot) { "$PSScriptRoot\releases\Helium-Custom-Theme.zip" } else { $null }
     $downloadFile = "$tempDir\Helium-Custom-Theme.zip"
 
-    if (Test-Path $localThemeDir) {
+    if ($localThemeDir -and (Test-Path $localThemeDir)) {
         Write-Host "Copiando tema da pasta local..." -ForegroundColor DarkGray
         Copy-Item -Path "$localThemeDir\*" -Destination $targetDir -Recurse -Force
-    } elseif (Test-Path $localThemeZip) {
+    } elseif ($localThemeZip -and (Test-Path $localThemeZip)) {
         Write-Host "Usando arquivo zip local..." -ForegroundColor DarkGray
         Expand-Archive -Path $localThemeZip -DestinationPath $targetDir -Force
     } else {
-        $url = "$BaseReleaseUrl/Helium-Custom-Theme.zip"
-        Write-Host "Baixando da release: $url" -ForegroundColor DarkGray
-        Invoke-WebRequest -Uri $url -OutFile $downloadFile -UseBasicParsing
+        $release = Get-LatestReleaseInfo
+        $asset = $release.assets | Where-Object { $_.name -like "Helium*.zip" } | Select-Object -First 1
+        if (-not $asset) {
+            throw "Nenhum arquivo zip do tema encontrado na última release ($($release.tag_name))."
+        }
+        Write-Host "Baixando release $($release.tag_name): $($asset.browser_download_url)" -ForegroundColor DarkGray
+        Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $downloadFile -UseBasicParsing
         Expand-Archive -Path $downloadFile -DestinationPath $targetDir -Force
     }
 

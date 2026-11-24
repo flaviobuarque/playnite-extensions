@@ -118,9 +118,13 @@ cd ..\..
 ## 🔄 Pipeline de CI/CD (GitHub Actions)
 
 O repositório conta com uma esteira automatizada em [`.github/workflows/release.yml`](.github/workflows/release.yml):
-- **Gatilho:** A cada push na branch `main` ou publicação de tag.
-- **Ambiente:** Máquina virtual `windows-latest`.
-- **Etapas:** Restaura dependências, compila a extensão em `Release`, obtém o `Toolbox.exe` oficial do Playnite, empacota o `.pext`, compacta o tema Helium em `.zip` e cria um **GitHub Release** público com os artefatos prontos.
+- **Integração Contínua (CI):** A cada push na branch `main`, o GitHub Actions valida a compilação em `Release`.
+- **Entrega Contínua (CD / Releases):** As releases são geradas e publicadas **apenas quando uma tag de versão é enviada** (ex: `v1.0.0`):
+  ```powershell
+  git tag v1.0.0
+  git push origin v1.0.0
+  ```
+- **Etapas na Release:** Obtém o `Toolbox.exe` oficial do Playnite, empacota o `.pext`, compacta o tema Helium em `.zip` e publica automaticamente a **GitHub Release** correspondente à tag.
 
 ---
 

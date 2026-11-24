@@ -31,9 +31,10 @@ jobs:
           dotnet build extensions/ExternalGameTracker/ExternalGameTracker.csproj -c Release
 
       - name: Download Playnite Toolbox
+        if: startsWith(github.ref, 'refs/tags/')
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Path "releases" -Force | Out-Null
+          New-Item -ItemType Directory -Path "dist" -Force | Out-Null
           New-Item -ItemType Directory -Path "tools" -Force | Out-Null
           Write-Host "Consultando versão mais recente do Playnite..."
           $release = Invoke-RestMethod -Uri "https://api.github.com/repos/JosefNemec/Playnite/releases/latest"
@@ -44,30 +45,33 @@ jobs:
           Write-Host "Playnite Toolbox pronto para empacotamento."
 
       - name: Package Extension (.pext)
+        if: startsWith(github.ref, 'refs/tags/')
         shell: pwsh
         run: |
-          & "tools\playnite\Toolbox.exe" pack "extensions\ExternalGameTracker\bin\Release" "releases"
-          Get-ChildItem -Path "releases"
+          & "tools\playnite\Toolbox.exe" pack "extensions\ExternalGameTracker\bin\Release" "dist"
+          Get-ChildItem -Path "dist"
 
       - name: Package Custom Helium Theme (.zip)
+        if: startsWith(github.ref, 'refs/tags/')
         shell: pwsh
         run: |
-          Compress-Archive -Path "themes\Helium\*" -DestinationPath "releases\Helium-Custom-Theme.zip" -Force
-          Get-ChildItem -Path "releases"
+          Compress-Archive -Path "themes\Helium\*" -DestinationPath "dist\Helium-Custom-Theme.zip" -Force
+          Get-ChildItem -Path "dist"
 
       - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: latest
-          name: Playnite Extensions & Themes (Latest Build)
+          tag_name: ${{ github.ref_name }}
+          name: Playnite Extensions & Themes (${{ github.ref_name }})
           body: |
-            ## 🚀 Release Automatizada
+            ## 🚀 Release ${{ github.ref_name }}
 
             Compilação automática gerada pelo GitHub Actions para o repositório **playnite-extensions**.
 
             ### 📦 Itens Disponíveis:
-            - **`ExternalGameTracker_1.0.0.pext`**: Extensão C# para rastreamento de processos externos (Zero Polling WMI, O(1) Cache, Anti-Cheat Safe).
-            - **`Helium-Custom-Theme.zip`**: Tema Helium com suporte nativo ao estado rodando (Badge minimalista, Botão Stop ⏹, Borda Neon e Título destacado).
+            - **ExternalGameTracker (`.pext`)**: Extensão C# para rastreamento de processos externos (Zero Polling WMI, O(1) Cache, Anti-Cheat Safe).
+            - **Helium Custom Theme (`Helium-Custom-Theme.zip`)**: Tema Helium com suporte nativo ao estado rodando (Badge minimalista, Botão Stop ⏹, Borda Neon e Título destacado).
 
             ### ⚡ Instalação Rápida via PowerShell (1 Comando):
             ```powershell
@@ -76,7 +80,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            releases/*.pext
-            releases/*.zip
+            dist/*.pext
+            dist/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
