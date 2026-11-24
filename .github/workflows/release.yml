@@ -35,9 +35,12 @@ jobs:
         run: |
           New-Item -ItemType Directory -Path "releases" -Force | Out-Null
           New-Item -ItemType Directory -Path "tools" -Force | Out-Null
-          Write-Host "Baixando utilitário oficial do Playnite..."
-          Invoke-WebRequest -Uri "https://github.com/JosefNemec/Playnite/releases/download/v10.65/Playnite1065.zip" -OutFile "tools\playnite.zip"
-          Expand-Archive -Path "tools\playnite.zip" -DestinationPath "tools\playnite" -Force
+          Write-Host "Consultando versão mais recente do Playnite..."
+          $release = Invoke-RestMethod -Uri "https://api.github.com/repos/JosefNemec/Playnite/releases/latest"
+          $asset = $release.assets | Where-Object { $_.name -like "*.7z" } | Select-Object -First 1
+          Write-Host "Baixando: $($asset.browser_download_url)"
+          Invoke-WebRequest -Uri $asset.browser_download_url -OutFile "tools\playnite.7z"
+          7z x "tools\playnite.7z" -o"tools\playnite" -y | Out-Null
           Write-Host "Playnite Toolbox pronto para empacotamento."
 
       - name: Package Extension (.pext)
