@@ -1,7 +1,7 @@
 # 🎮 Playnite Extensions & Themes Suite
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/JosefNemec/Playnite/master/source/Playnite/Resources/Icons/applogo.png" width="96" alt="Playnite Logo" />
+  <img src="assets/playnite-logo.png" width="96" alt="Playnite Logo" />
 </p>
 
 <p align="center">
@@ -9,11 +9,11 @@
 </p>
 
 <p align="center">
-  <a href="https://playnite.link"><img src="https://img.shields.io/badge/Playnite-v10.x-orange?style=for-the-badge&logo=playnite&logoColor=white" alt="Playnite v10" /></a>
-  <a href="https://github.com/flaviobuarque/playnite-extensions/actions"><img src="https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-brightgreen?style=for-the-badge&logo=githubactions&logoColor=white" alt="CI/CD" /></a>
-  <a href="https://dotnet.microsoft.com/"><img src="https://img.shields.io/badge/.NET%20Framework-4.6.2-purple?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET 4.6.2" /></a>
-  <a href="https://learn.microsoft.com/en-us/dotnet/csharp/"><img src="https://img.shields.io/badge/Language-C%23%2010-blue?style=for-the-badge&logo=csharp&logoColor=white" alt="C# 10" /></a>
-  <a href="#licença"><img src="https://img.shields.io/badge/License-MIT-success?style=for-the-badge" alt="MIT License" /></a>
+  <a href="https://playnite.link"><img src="https://img.shields.io/badge/Playnite-v10.x-FF5E3A?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9Ik03LjUgNkM0LjUgNiAyIDguOCAyIDEyLjhjMCAyLjcgMS4xIDUuMiAyLjggNS4yIDEuMiAwIDItMS4yIDMuMS0yLjUuNi0uNyAxLjMtMSAyLjEtMWg0Yy44IDAgMS41LjMgMi4xIDEgMS4xIDEuMyAxLjkgMi41IDMuMSAyLjUgMS43IDAgMi44LTIuNSAyLjgtNS4yQzIyIDguOCAxOS41IDYgMTYuNSA2Yy0xLjUgMC0yLjUuNy00LjUuN1M5IDYgNy41IDZ6bS41IDQuMmExLjggMS44IDAgMSAxIDAgMy42IDEuOCAxLjggMCAwIDEgMC0zLjZ6bTctMWExIDEgMCAxIDEgMCAyIDEgMSAwIDAgMSAwLTJ6bS0yIDJhMSAxIDAgMSAxIDAgMiAxIDEgMCAwIDEgMC0yem00IDBhMSAxIDAgMSAxIDAgMiAxIDEgMCAwIDEgMC0yem0tMiAyYTEgMSAwIDEgMSAwIDIgMSAxIDAgMCAxIDAtMnoiLz48L3N2Zz4=" alt="Playnite v10" /></a>
+  <a href="https://github.com/flaviobuarque/playnite-extensions/actions"><img src="https://img.shields.io/github/actions/workflow/status/flaviobuarque/playnite-extensions/release.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=CI%2FCD" alt="CI/CD" /></a>
+  <a href="https://dotnet.microsoft.com/"><img src="https://img.shields.io/badge/.NET%20Framework-4.6.2-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET 4.6.2" /></a>
+  <a href="https://learn.microsoft.com/en-us/dotnet/csharp/"><img src="https://img.shields.io/badge/Language-C%23%2010-239120?style=for-the-badge&logo=dotnet&logoColor=white" alt="C# 10" /></a>
+  <a href="#-licença"><img src="https://img.shields.io/badge/License-MIT-success?style=for-the-badge" alt="MIT License" /></a>
 </p>
 
 ---

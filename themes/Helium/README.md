@@ -1,7 +1,7 @@
 # 🎨 Helium Desktop Theme (Active Running Highlights Mod)
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/JosefNemec/Playnite/master/source/Playnite/Resources/Icons/applogo.png" width="80" alt="Playnite Logo" />
+  <img src="../../assets/playnite-logo.png" width="80" alt="Playnite Logo" />
 </p>
 
 <p align="center">
@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Playnite%20Theme%20API-2.8.0-orange?style=for-the-badge" alt="Theme API 2.8.0" />
+  <img src="https://img.shields.io/badge/Playnite%20Theme%20API-2.8.0-FF5E3A?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9Ik03LjUgNkM0LjUgNiAyIDguOCAyIDEyLjhjMCAyLjcgMS4xIDUuMiAyLjggNS4yIDEuMiAwIDItMS4yIDMuMS0yLjUuNi0uNyAxLjMtMSAyLjEtMWg0Yy44IDAgMS41LjMgMi4xIDEgMS4xIDEuMyAxLjkgMi41IDMuMSAyLjUgMS43IDAgMi44LTIuNSAyLjgtNS4yQzIyIDguOCAxOS41IDYgMTYuNSA2Yy0xLjUgMC0yLjUuNy00LjUuN1M5IDYgNy41IDZ6bS41IDQuMmExLjggMS44IDAgMSAxIDAgMy42IDEuOCAxLjggMCAwIDEgMC0zLjZ6bTctMWExIDEgMCAxIDEgMCAyIDEgMSAwIDAgMSAwLTJ6bS0yIDJhMSAxIDAgMSAxIDAgMiAxIDEgMCAwIDEgMC0yem00IDBhMSAxIDAgMSAxIDAgMiAxIDEgMCAwIDEgMC0yem0tMiAyYTEgMSAwIDEgMSAwIDIgMSAxIDAgMCAxIDAtMnoiLz48L3N2Zz4=" alt="Theme API 2.8.0" />
   <img src="https://img.shields.io/badge/Theme%20Base-Helium%20v1.71-blue?style=for-the-badge" alt="Helium v1.71" />
   <img src="https://img.shields.io/badge/UI%20Framework-WPF%20%2F%20XAML-purple?style=for-the-badge" alt="WPF / XAML" />
   <img src="https://img.shields.io/badge/Trigger-IsRunning%20%3D%20True-brightgreen?style=for-the-badge" alt="IsRunning Trigger" />

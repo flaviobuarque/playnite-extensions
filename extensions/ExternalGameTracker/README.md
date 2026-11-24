@@ -1,7 +1,7 @@
 # ⏱️ External Game Tracker (Playnite Extension)
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/JosefNemec/Playnite/master/source/Playnite/Resources/Icons/applogo.png" width="80" alt="Playnite Logo" />
+  <img src="../../assets/playnite-logo.png" width="80" alt="Playnite Logo" />
 </p>
 
 <p align="center">
@@ -9,11 +9,11 @@
 </p>
 
 <p align="center">
-  <a href="https://playnite.link"><img src="https://img.shields.io/badge/Playnite-v10.x-orange?style=for-the-badge&logo=playnite&logoColor=white" alt="Playnite v10" /></a>
+  <a href="https://playnite.link"><img src="https://img.shields.io/badge/Playnite-v10.x-FF5E3A?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9Ik03LjUgNkM0LjUgNiAyIDguOCAyIDEyLjhjMCAyLjcgMS4xIDUuMiAyLjggNS4yIDEuMiAwIDItMS4yIDMuMS0yLjUuNi0uNyAxLjMtMSAyLjEtMWg0Yy44IDAgMS41LjMgMi4xIDEgMS4xIDEuMyAxLjkgMi41IDMuMSAyLjUgMS43IDAgMi44LTIuNSAyLjgtNS4yQzIyIDguOCAxOS41IDYgMTYuNSA2Yy0xLjUgMC0yLjUuNy00LjUuN1M5IDYgNy41IDZ6bS41IDQuMmExLjggMS44IDAgMSAxIDAgMy42IDEuOCAxLjggMCAwIDEgMC0zLjZ6bTctMWExIDEgMCAxIDEgMCAyIDEgMSAwIDAgMSAwLTJ6bS0yIDJhMSAxIDAgMSAxIDAgMiAxIDEgMCAwIDEgMC0yem00IDBhMSAxIDAgMSAxIDAgMiAxIDEgMCAwIDEgMC0yem0tMiAyYTEgMSAwIDEgMSAwIDIgMSAxIDAgMCAxIDAtMnoiLz48L3N2Zz4=" alt="Playnite v10" /></a>
   <img src="https://img.shields.io/badge/Engine-Zero%20Polling%20WMI-brightgreen?style=for-the-badge" alt="Zero Polling" />
   <img src="https://img.shields.io/badge/Lookup-O(1)%20Hash%20Cache-blue?style=for-the-badge" alt="O(1) Cache" />
   <img src="https://img.shields.io/badge/Anti--Cheat-Ricochet%20%7C%20EAC%20Safe-success?style=for-the-badge" alt="Anti-Cheat Safe" />
-  <img src="https://img.shields.io/badge/.NET%20Framework-4.6.2-purple?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET 4.6.2" />
+  <img src="https://img.shields.io/badge/.NET%20Framework-4.6.2-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET 4.6.2" />
 </p>
 
 ---
