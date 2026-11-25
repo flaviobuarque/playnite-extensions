@@ -6,6 +6,9 @@ on:
       - main
     tags:
       - 'v*'
+      - 'egt-v*'
+      - 'isu-v*'
+      - 'helium-v*'
   workflow_dispatch:
 
 permissions:
@@ -19,16 +22,20 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
-      - name: Build ExternalGameTracker
+      - name: Build All Extensions
         run: |
           dotnet restore extensions/ExternalGameTracker/ExternalGameTracker.csproj
           dotnet build extensions/ExternalGameTracker/ExternalGameTracker.csproj -c Release
+          dotnet restore extensions/InstallationStatusUpdater/InstallationStatusUpdater.csproj
+          dotnet build extensions/InstallationStatusUpdater/InstallationStatusUpdater.csproj -c Release
 
       - name: Download Playnite Toolbox
         if: startsWith(github.ref, 'refs/tags/')
@@ -44,11 +51,12 @@ jobs:
           7z x "tools\playnite.7z" -o"tools\playnite" -y | Out-Null
           Write-Host "Playnite Toolbox pronto para empacotamento."
 
-      - name: Package Extension (.pext)
+      - name: Package Extensions (.pext)
         if: startsWith(github.ref, 'refs/tags/')
         shell: pwsh
         run: |
           & "tools\playnite\Toolbox.exe" pack "extensions\ExternalGameTracker\bin\Release" "dist"
+          & "tools\playnite\Toolbox.exe" pack "extensions\InstallationStatusUpdater\bin\Release" "dist"
           Get-ChildItem -Path "dist"
 
       - name: Package Custom Helium Theme (.zip)
@@ -58,25 +66,102 @@ jobs:
           Compress-Archive -Path "themes\Helium\*" -DestinationPath "dist\Helium-Custom-Theme.zip" -Force
           Get-ChildItem -Path "dist"
 
+      - name: Generate Release Notes
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+
+          function Get-YamlVersion([string]$path) {
+              $m = Select-String -Path $path -Pattern "^Version:\s*(.+)$" | Select-Object -First 1
+              if ($m) { return $m.Matches.Groups[1].Value.Trim() }
+              return "1.0.0"
+          }
+
+          $egtVer = Get-YamlVersion "extensions/ExternalGameTracker/extension.yaml"
+          $isuVer = Get-YamlVersion "extensions/InstallationStatusUpdater/extension.yaml"
+          $helVer = Get-YamlVersion "themes/Helium/theme.yaml"
+
+          $egtFile = (Get-ChildItem "dist" -Filter "ExternalGameTracker*.pext" | Select-Object -First 1).Name
+          $isuFile = (Get-ChildItem "dist" -Filter "Installation_Status_Updater*.pext" | Select-Object -First 1).Name
+          $helFile = "Helium-Custom-Theme.zip"
+
+          $egtUpdated = $false; $isuUpdated = $false; $helUpdated = $false
+          $scopeArgs = @()
+
+          $prevTag = git describe --tags --abbrev=0 "$tag^" 2>$null
+
+          if ($tag -like "egt-v*") {
+              $egtUpdated = $true
+              $scopeArgs = @("--", "extensions/ExternalGameTracker")
+              $prevTag = git describe --tags --match "egt-v*" --match "v*" --abbrev=0 "$tag^" 2>$null
+          } elseif ($tag -like "isu-v*") {
+              $isuUpdated = $true
+              $scopeArgs = @("--", "extensions/InstallationStatusUpdater")
+              $prevTag = git describe --tags --match "isu-v*" --match "v*" --abbrev=0 "$tag^" 2>$null
+          } elseif ($tag -like "helium-v*") {
+              $helUpdated = $true
+              $scopeArgs = @("--", "themes/Helium")
+              $prevTag = git describe --tags --match "helium-v*" --match "v*" --abbrev=0 "$tag^" 2>$null
+          } else {
+              if ($prevTag) {
+                  $changed = git diff --name-only "$prevTag..$tag"
+                  $egtUpdated = [bool]($changed | Where-Object { $_ -like "extensions/ExternalGameTracker/*" })
+                  $isuUpdated = [bool]($changed | Where-Object { $_ -like "extensions/InstallationStatusUpdater/*" })
+                  $helUpdated = [bool]($changed | Where-Object { $_ -like "themes/Helium/*" })
+                  if (-not ($egtUpdated -or $isuUpdated -or $helUpdated)) {
+                      $egtUpdated = $true; $isuUpdated = $true; $helUpdated = $true
+                  }
+              } else {
+                  $egtUpdated = $true; $isuUpdated = $true; $helUpdated = $true
+              }
+          }
+
+          $egtStatus = if ($egtUpdated) { "🆕 **Atualizado**" } else { "⏸️ Sem alterações" }
+          $isuStatus = if ($isuUpdated) { "🆕 **Atualizado**" } else { "⏸️ Sem alterações" }
+          $helStatus = if ($helUpdated) { "🆕 **Atualizado**" } else { "⏸️ Sem alterações" }
+
+          # Mensagem anotada da tag (somente se for annotated tag) ou histórico de commits
+          $objType = (git for-each-ref --format='%(objecttype)' "refs/tags/$tag" | Out-String).Trim()
+          $tagNote = if ($objType -eq "tag") { (git tag -l --format='%(contents)' $tag | Out-String).Trim() } else { "" }
+          if (-not $tagNote) {
+              $range = if ($prevTag) { "$prevTag..$tag" } else { $tag }
+              $commits = git log $range --pretty=format:"- %s" --no-merges @scopeArgs
+              $tagNote = if ($commits) { ($commits -join "`n") } else { "- Atualização geral de manutenção e empacotamento." }
+          }
+
+          $lines = @(
+              "## 🚀 Release ``$tag``",
+              "",
+              "Pacote completo compilado automaticamente pelo GitHub Actions para o repositório **playnite-extensions**.",
+              "",
+              "### 📊 Status dos Componentes",
+              "| Componente | Versão | Status nesta Release | Arquivo nos Assets |",
+              "|---|---|---|---|",
+              "| **External Game Tracker** | ``v$egtVer`` | $egtStatus | ``$egtFile`` |",
+              "| **Installation Status Updater** | ``v$isuVer`` | $isuStatus | ``$isuFile`` |",
+              "| **Tema Helium Customizado** | ``v$helVer-mod`` | $helStatus | ``$helFile`` |",
+              "",
+              "### 📝 O que mudou",
+              $tagNote,
+              "",
+              "---",
+              "",
+              "### ⚡ Instalação Rápida via PowerShell (Assistente Visual)",
+              '```powershell',
+              "irm https://raw.githubusercontent.com/flaviobuarque/playnite-extensions/main/install.ps1 | iex",
+              '```'
+          )
+
+          Set-Content -Path "release_body.md" -Value ($lines -join "`n") -Encoding UTF8
+
       - name: Publish GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: Playnite Extensions & Themes (${{ github.ref_name }})
-          body: |
-            ## 🚀 Release ${{ github.ref_name }}
-
-            Compilação automática gerada pelo GitHub Actions para o repositório **playnite-extensions**.
-
-            ### 📦 Itens Disponíveis:
-            - **ExternalGameTracker (`.pext`)**: Extensão C# para rastreamento de processos externos (Zero Polling WMI, O(1) Cache, Anti-Cheat Safe).
-            - **Helium Custom Theme (`Helium-Custom-Theme.zip`)**: Tema Helium com suporte nativo ao estado rodando (Badge minimalista, Botão Stop ⏹, Borda Neon e Título destacado).
-
-            ### ⚡ Instalação Rápida via PowerShell (1 Comando):
-            ```powershell
-            irm https://raw.githubusercontent.com/flaviobuarque/playnite-extensions/main/install.ps1 | iex
-            ```
+          body_path: release_body.md
           draft: false
           prerelease: false
           files: |

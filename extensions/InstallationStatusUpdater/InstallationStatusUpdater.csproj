@@ -1,0 +1,125 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net462</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <LangVersion>latest</LangVersion>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultPageItems>false</EnableDefaultPageItems>
+    <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="All" />
+    <PackageReference Include="PlayniteSDK" Version="6.9.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Management" />
+    <Reference Include="System.Web" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Include="app.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Localization\en_US.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Page>
+    <Page Include="Presentation\InstallationStatusUpdaterSettingsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Presentation\NoChangesDialogView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Presentation\OrphanFoldersWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Presentation\StatusUpdateResultsWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Common\PlayniteUtilitiesCommon\PlayniteUtilities.cs" Link="Shared\PlayniteUtilitiesCommon\PlayniteUtilities.cs" />
+    <Compile Include="Common\PluginsCommon\Converters\NumericConverters.cs" Link="Shared\PluginsCommon\Converters\NumericConverters.cs" />
+    <Compile Include="Common\PluginsCommon\Encryption.cs" Link="Shared\PluginsCommon\Encryption.cs" />
+    <Compile Include="Common\PluginsCommon\Explorer.cs" Link="Shared\PluginsCommon\Explorer.cs" />
+    <Compile Include="Common\PluginsCommon\Extensions\CharExtensions.cs" Link="Shared\PluginsCommon\Extensions\CharExtensions.cs" />
+    <Compile Include="Common\PluginsCommon\Extensions\EnumExtensions.cs" Link="Shared\PluginsCommon\Extensions\EnumExtensions.cs" />
+    <Compile Include="Common\PluginsCommon\Extensions\LongExtensions.cs" Link="Shared\PluginsCommon\Extensions\LongExtensions.cs" />
+    <Compile Include="Common\PluginsCommon\Extensions\StringExtensions.cs" Link="Shared\PluginsCommon\Extensions\StringExtensions.cs" />
+    <Compile Include="Common\PluginsCommon\FileSystem.cs" Link="Shared\PluginsCommon\FileSystem.cs" />
+    <Compile Include="Common\PluginsCommon\GlobalCommands.cs" Link="Shared\PluginsCommon\GlobalCommands.cs" />
+    <Compile Include="Common\PluginsCommon\Native\Kernel32.cs" Link="Shared\PluginsCommon\Native\Kernel32.cs" />
+    <Compile Include="Common\PluginsCommon\Native\Ntdll.cs" Link="Shared\PluginsCommon\Native\Ntdll.cs" />
+    <Compile Include="Common\PluginsCommon\Native\Processthreadsapi.cs" Link="Shared\PluginsCommon\Native\Processthreadsapi.cs" />
+    <Compile Include="Common\PluginsCommon\Native\WinBase.cs" Link="Shared\PluginsCommon\Native\WinBase.cs" />
+    <Compile Include="Common\PluginsCommon\Paths.cs" Link="Shared\PluginsCommon\Paths.cs" />
+    <Compile Include="Common\PluginsCommon\ProcessStarter.cs" Link="Shared\PluginsCommon\ProcessStarter.cs" />
+
+    <Compile Include="Application\DeviceEventWatcherService.cs" />
+    <Compile Include="Application\DirectorySizeCache.cs" />
+    <Compile Include="Application\DirectorySizeProbe.cs" />
+    <Compile Include="Application\DirectoryWatcherService.cs" />
+    <Compile Include="Application\DiskConcurrencyLimiter.cs" />
+    <Compile Include="Application\GameFolderRootResolver.cs" />
+    <Compile Include="Application\GamesInstallationStatusScanner.cs" />
+    <Compile Include="Application\MinimumInstallationSizeRule.cs" />
+    <Compile Include="Application\MinimumSizeRuleSelector.cs" />
+    <Compile Include="Application\OrphanFoldersScanner.cs" />
+    <Compile Include="Application\PathScopeMatcher.cs" />
+    <Compile Include="Application\PathsResolver.cs" />
+    <Compile Include="Application\StringPathsDetector.cs" />
+    <Compile Include="Application\TagsUpdater.cs" />
+
+    <Compile Include="Domain\Results\DetectionReasonProvider.cs" />
+    <Compile Include="Domain\Results\InstallationDetectionOutcome.cs" />
+    <Compile Include="Domain\Results\InstallationDetectionReason.cs" />
+    <Compile Include="Domain\Results\InstallationDetectionResult.cs" />
+    <Compile Include="Domain\Results\OrphanFolderData.cs" />
+    <Compile Include="Domain\Results\StatusUpdateResults.cs" />
+    <Compile Include="Domain\Results\UpdatedEntryData.cs" />
+    <Compile Include="Domain\ValueObjects\MinimumSizeRuleGameExclusion.cs" />
+    <Compile Include="Domain\ValueObjects\PlatformMinimumSizeRule.cs" />
+    <Compile Include="Domain\ValueObjects\SizeUnitOption.cs" />
+    <Compile Include="Domain\ValueObjects\WatchedDirectory.cs" />
+
+    <Compile Include="Presentation\InstallationStatusUpdaterSettingsView.xaml.cs" DependentUpon="InstallationStatusUpdaterSettingsView.xaml" />
+    <Compile Include="Presentation\NoChangesDialogView.xaml.cs" DependentUpon="NoChangesDialogView.xaml" />
+    <Compile Include="Presentation\OrphanFoldersWindow.xaml.cs" DependentUpon="OrphanFoldersWindow.xaml" />
+    <Compile Include="Presentation\OrphanFoldersWindowViewModel.cs" />
+    <Compile Include="Presentation\OrphanFolderViewModel.cs" />
+    <Compile Include="Presentation\SizeDisplayFormatter.cs" />
+    <Compile Include="Presentation\SourceBadgeProvider.cs" />
+    <Compile Include="Presentation\SourceFilterItem.cs" />
+    <Compile Include="Presentation\StatusUpdateResultEntryViewModel.cs" />
+    <Compile Include="Presentation\StatusUpdateResultsWindow.xaml.cs" DependentUpon="StatusUpdateResultsWindow.xaml" />
+    <Compile Include="Presentation\StatusUpdateResultsWindowViewModel.cs" />
+
+    <Compile Include="InstallationStatusUpdater.cs" />
+    <Compile Include="InstallationStatusUpdaterSettings.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="extension.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="icon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="CopyLocalizationFiles" AfterTargets="Build">
+    <ItemGroup>
+      <LocalizationFiles Include="Localization\*.xaml" />
+    </ItemGroup>
+    <Copy SourceFiles="@(LocalizationFiles)" DestinationFolder="$(OutputPath)Localization" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

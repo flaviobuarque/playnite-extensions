@@ -18,23 +18,22 @@
 
 ---
 
-## ⚡ Instalação Rápida em 1 Linha (PowerShell)
+## ⚡ Instalação Rápida em 1 Linha (Assistente Visual WPF)
 
-Instale qualquer extensão ou tema diretamente no seu Playnite sem precisar clonar ou compilar o repositório. Abra o **PowerShell** e execute:
+Instale qualquer extensão ou tema diretamente no seu Playnite usando o assistente gráfico, sem precisar clonar ou compilar o repositório. Abra o **PowerShell** e execute:
 
 ```powershell
 irm https://raw.githubusercontent.com/flaviobuarque/playnite-extensions/main/install.ps1 | iex
 ```
 
-> **O que o instalador faz automaticamente:**
-> 1. Localiza a instalação do Playnite na sua máquina (`%LOCALAPPDATA%\Playnite` ou Registro).
-> 2. Fecha o Playnite se estiver em execução para evitar bloqueios de arquivos DLL/XAML.
-> 3. Apresenta um menu seletivo para você escolher o que deseja instalar:
->    - `[1]` Instalar Tudo (Extensões + Tema)
->    - `[2]` Instalar apenas a Extensão ExternalGameTracker
->    - `[3]` Instalar apenas o Tema Helium Customizado
-> 4. Baixa os arquivos compilados da release mais recente e realiza o deploy nas pastas corretas.
-> 5. Oferece a opção de abrir o Playnite pronto para jogar.
+> **O que o assistente gráfico faz em 5 etapas:**
+> 1. **Início:** Carrega dinamicamente o catálogo (`catalog.json`) com todos os plugins e temas disponíveis.
+> 2. **Playnite:** Localiza automaticamente a instalação (ou permite selecionar manualmente uma pasta Portable).
+> 3. **Pacotes:** Exibe checkboxes com busca rápida para você marcar apenas o que deseja instalar.
+> 4. **Instalação:** Fecha o Playnite com segurança (com confirmação), baixa os pacotes da última release e aplica nos diretórios corretos.
+> 5. **Concluir:** Mostra o resumo da instalação e oferece a opção de abrir o Playnite imediatamente.
+
+*(Modo terminal avançado sem interface: `.\install.ps1 -Silent -ForceClose`)*
 
 ---
 
@@ -43,7 +42,8 @@ irm https://raw.githubusercontent.com/flaviobuarque/playnite-extensions/main/ins
 | Componente | Tipo | Descrição | Documentação |
 |---|---|---|---|
 | **External Game Tracker** | Extensão C# | Detecta jogos abertos externamente (Battle.net, Steam, atalhos) via WMI Kernel Trace sem consumo contínuo de CPU, com cache $O(1)$ e compatibilidade com anti-cheats (Ricochet, EAC, BattlEye). | [Ver Documentação](extensions/ExternalGameTracker/README.md) |
-| **Helium (Running Highlights)** | Tema Desktop | Customização completa do tema Helium com badge minimalista `● RODANDO`, botão de Play que vira Stop ⏹ (`#FF5252`), borda neon esmeralda (`#00FF88`) e barra de título destacada. | [Ver Documentação](themes/Helium/README.md) |
+| **Installation Status Updater** | Extensão C# | Detecção rápida de jogos instalados em múltiplos discos com controle de concorrência I/O, regras de tamanho mínimo e scanner dedicado de pastas órfãs. | [Ver Documentação](extensions/InstallationStatusUpdater/README.md) |
+| **Helium (Running Highlights)** | Tema Desktop | Tema moderno customizado com badge minimalista `● RODANDO`, botão Play que alterna para Stop ⏹, borda neon esmeralda e barra de título destacada. | [Ver Documentação](themes/Helium/README.md) |
 
 ---
 
@@ -53,26 +53,24 @@ irm https://raw.githubusercontent.com/flaviobuarque/playnite-extensions/main/ins
 playnite-extensions/
 ├── .github/
 │   └── workflows/
-│       └── release.yml                 # Pipeline CI/CD que compila e gera releases na nuvem
-├── extensions/                         # Coleção de extensões Playnite
-│   └── ExternalGameTracker/            # Extensão de rastreamento de processos externos
-│       ├── README.md                   # Documentação detalhada da extensão
-│       ├── ExternalGameTracker.csproj  # Projeto .NET 4.6.2 / C# 10
-│       ├── ExternalGameTrackerPlugin.cs# Classe principal do plugin
-│       ├── extension.yaml              # Manifesto oficial da extensão
-│       ├── Models/                     # P/Invoke QueryFullProcessImageName com retry
-│       ├── Services/                   # LibraryIndexer O(1), ProcessWatcher WMI, SessionManager
-│       ├── Settings/                   # Configurações e ViewModel
-│       └── Views/                      # Interface de configurações XAML
+│       └── release.yml                 # Pipeline CI/CD (compila tudo e gera release por tag)
+├── assets/
+│   └── playnite-logo.png               # Logo oficial usada nos READMEs e instalador
+├── extensions/                         # Coleção de extensões Playnite (.NET 4.6.2 / SDK-style)
+│   ├── ExternalGameTracker/            # Rastreamento externo via WMI Kernel Trace
+│   │   ├── README.md
+│   │   └── ...
+│   └── InstallationStatusUpdater/      # Scanner assíncrono de instalação e pastas órfãs
+│       ├── README.md
+│       └── ...
 ├── themes/                             # Coleção de temas customizados
 │   └── Helium/                         # Backup completo do tema Helium modificado
-│       ├── README.md                   # Guia visual detalhado do tema
-│       ├── theme.yaml                  # Manifesto oficial do tema
-│       ├── Constants.xaml              # Variáveis e estilos
+│       ├── README.md
 │       ├── DerivedStyles/              # GridViewItemStyle e GridViewItemTemplate modificados
-│       └── ...                         # Controles, imagens e views
-├── releases/                           # Pacotes compilados de distribuição (.pext e .zip)
-├── install.ps1                         # Script instalador universal (Web irm|iex e local)
+│       └── ...
+├── releases/                           # Pacotes compilados localmente (.pext e .zip)
+├── catalog.json                        # Catálogo escalável consumido pela GUI do instalador
+├── install.ps1                         # Instalador gráfico WPF Wizard (Web irm|iex e local)
 └── README.md                           # Este documento
 ```
 
@@ -80,36 +78,28 @@ playnite-extensions/
 
 ## 🛠️ Como Compilar Manualmente (Desenvolvedores)
 
-Se você desejar clonar o repositório e compilar por conta própria:
-
 ### Pré-requisitos
 - [.NET SDK 6.0+](https://dotnet.microsoft.com/download) instalado.
 - [Playnite 10+](https://playnite.link) instalado.
 - Git.
 
-### 1. Clonar o Repositório
+### 1. Clonar e Compilar as Extensões
 ```powershell
 git clone https://github.com/flaviobuarque/playnite-extensions.git
 cd playnite-extensions
+
+dotnet build extensions/ExternalGameTracker/ExternalGameTracker.csproj -c Release
+dotnet build extensions/InstallationStatusUpdater/InstallationStatusUpdater.csproj -c Release
 ```
 
-### 2. Compilar a Extensão
+### 2. Empacotar os `.pext` (Playnite Toolbox)
 ```powershell
-cd extensions/ExternalGameTracker
-dotnet restore
-dotnet build -c Release
-```
-Os binários compilados estarão localizados em `extensions/ExternalGameTracker/bin/Release/`.
-
-### 3. Empacotar o `.pext` (Playnite Toolbox)
-```powershell
-& "$env:LOCALAPPDATA\Playnite\Toolbox.exe" pack "bin\Release" "..\..\releases"
+& "$env:LOCALAPPDATA\Playnite\Toolbox.exe" pack "extensions\ExternalGameTracker\bin\Release" "releases"
+& "$env:LOCALAPPDATA\Playnite\Toolbox.exe" pack "extensions\InstallationStatusUpdater\bin\Release" "releases"
 ```
 
-### 4. Executar o Instalador Local
-Você pode rodar o instalador a partir da raiz do repositório local:
+### 3. Executar o Instalador Local
 ```powershell
-cd ..\..
 .\install.ps1
 ```
 
@@ -118,13 +108,16 @@ cd ..\..
 ## 🔄 Pipeline de CI/CD (GitHub Actions)
 
 O repositório conta com uma esteira automatizada em [`.github/workflows/release.yml`](.github/workflows/release.yml):
-- **Integração Contínua (CI):** A cada push na branch `main`, o GitHub Actions valida a compilação em `Release`.
-- **Entrega Contínua (CD / Releases):** As releases são geradas e publicadas **apenas quando uma tag de versão é enviada** (ex: `v1.0.0`):
+- **Integração Contínua (CI):** A cada push na branch `main`, todas as extensões são compiladas em `Release` para validação, **sem criar release**.
+- **Entrega Contínua (CD / Releases por Tag):** As releases são publicadas apenas ao subir uma tag. O workflow empacota **todos os componentes** nos *Assets* e gera automaticamente a tabela destacando apenas o que mudou:
+  - `egt-v1.0.1` → Destaca apenas o **External Game Tracker** como atualizado.
+  - `isu-v2.5.5` → Destaca apenas o **Installation Status Updater** como atualizado.
+  - `helium-v1.1.0` → Destaca apenas o **Tema Helium** como atualizado.
+  - `v1.1.0` → Tag global (detecta automaticamente pelo `git diff` quais pastas mudaram).
   ```powershell
-  git tag v1.0.0
-  git push origin v1.0.0
+  git tag -a v1.1.0 -m "- Descrição das novidades"
+  git push origin v1.1.0
   ```
-- **Etapas na Release:** Obtém o `Toolbox.exe` oficial do Playnite, empacota o `.pext`, compacta o tema Helium em `.zip` e publica automaticamente a **GitHub Release** correspondente à tag.
 
 ---
 

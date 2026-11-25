@@ -1,0 +1,280 @@
+<UserControl x:Class="InstallationStatusUpdater.Presentation.StatusUpdateResultsWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:InstallationStatusUpdater.Presentation"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}" />
+        <Style x:Key="SizeColumnTextStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+            <Setter Property="TextAlignment" Value="Right" />
+            <Setter Property="Margin" Value="0,0,16,0" />
+            <Setter Property="ToolTip" Value="{Binding SizeTooltip}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="RowContextMenuStyle" TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+            <Setter Property="ContextMenu">
+                <Setter.Value>
+                    <ContextMenu>
+                        <MenuItem Header="{DynamicResource LOCInstallation_Status_Updater_ContextMenuOpenFolder}"
+                                  Command="{Binding DataContext.OpenFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                  CommandParameter="{Binding}" />
+                        <MenuItem Header="{DynamicResource LOCInstallation_Status_Updater_ContextMenuExcludeSizeRule}"
+                                  Command="{Binding DataContext.ExcludeSingleFromSizeRuleCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                  CommandParameter="{Binding}" />
+                        <MenuItem Header="{DynamicResource LOCInstallation_Status_Updater_ContextMenuAddIgnore}"
+                                  Command="{Binding DataContext.AddIgnoreCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                  CommandParameter="{Binding}" />
+                    </ContextMenu>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid Margin="20">
+        <DockPanel>
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,10,0,0">
+                <Button Content="{Binding SelectAllCommandLabel}"
+                        Command="{Binding SelectAllCommand}"
+                        MinWidth="120"
+                        Margin="0,0,10,0" />
+
+                <StackPanel Orientation="Horizontal" Visibility="{Binding ApplyButtonsVisibility}">
+                    <Button Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdateResultsWindowApplySelectedButtonLabel}"
+                            Command="{Binding ApplySelectedCommand}"
+                            MinWidth="120"
+                            Margin="0,0,10,0" />
+                    <Button Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdateResultsWindowApplyButtonLabel}"
+                            Command="{Binding ApplyCommand}"
+                            MinWidth="120"
+                            Margin="0,0,10,0" />
+                    <Button Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdateResultsWindowDiscardButtonLabel}"
+                            Command="{Binding DiscardCommand}"
+                            MinWidth="120"
+                            Margin="0,0,10,0" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Visibility="{Binding RevertButtonsVisibility}">
+                    <Button Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdateResultsWindowRevertSelectedButtonLabel}"
+                            Command="{Binding RevertSelectedCommand}"
+                            MinWidth="120"
+                            Margin="0,0,10,0" />
+                    <Button Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdateResultsWindowRevertButtonLabel}"
+                            Command="{Binding RevertAllCommand}"
+                            MinWidth="120"
+                            Margin="0,0,10,0" />
+                </StackPanel>
+
+                <Button Content="{Binding ExcludeFromSizeRuleButtonLabel}"
+                        Command="{Binding ExcludeFromSizeRuleCommand}"
+                        ToolTip="{Binding ExcludeFromSizeRuleToolTip}"
+                        MinWidth="160" />
+            </StackPanel>
+
+            <StackPanel DockPanel.Dock="Top">
+                <!-- Summary Cards -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="12" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Card Jogos Instalados -->
+                    <Border Grid.Column="0"
+                            Background="#1A2E20"
+                            BorderBrush="#4CAF50"
+                            BorderThickness="4,1,1,1"
+                            CornerRadius="6"
+                            Padding="14,10"
+                            Opacity="{Binding InstalledCardOpacity}">
+                        <StackPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding TotalGamesSetAsInstalled}"
+                                           FontSize="22"
+                                           FontWeight="Bold"
+                                           Foreground="#81C784" />
+                                <TextBlock Text="{Binding InstalledSizeDeltaFormatted}"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="#A5D6A7"
+                                           Margin="8,0,0,2"
+                                           VerticalAlignment="Bottom"
+                                           Visibility="{Binding HasInstalledSizeDelta, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            </StackPanel>
+                            <TextBlock Text="{Binding InstalledHeaderLabel}"
+                                       FontSize="11"
+                                       Opacity="0.8"
+                                       TextWrapping="Wrap"
+                                       Margin="0,2,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Card Jogos Desinstalados -->
+                    <Border Grid.Column="2"
+                            Background="#2E1A1A"
+                            BorderBrush="#E53935"
+                            BorderThickness="4,1,1,1"
+                            CornerRadius="6"
+                            Padding="14,10"
+                            Opacity="{Binding UninstalledCardOpacity}">
+                        <StackPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding TotalGamesSetAsUninstalled}"
+                                           FontSize="22"
+                                           FontWeight="Bold"
+                                           Foreground="#E57373" />
+                                <TextBlock Text="{Binding UninstalledSizeDeltaFormatted}"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="#EF9A9A"
+                                           Margin="8,0,0,2"
+                                           VerticalAlignment="Bottom"
+                                           Visibility="{Binding HasUninstalledSizeDelta, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            </StackPanel>
+                            <TextBlock Text="{Binding UninstalledHeaderLabel}"
+                                       FontSize="11"
+                                       Opacity="0.8"
+                                       TextWrapping="Wrap"
+                                       Margin="0,2,0,0" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Store Filter Badges Bar -->
+                <ItemsControl ItemsSource="{Binding SourceFilters}" Margin="0,0,0,8">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding DataContext.SelectSourceFilterCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}"
+                                    Margin="0,0,6,6"
+                                    Padding="0"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Cursor="Hand">
+                                <Border Background="{Binding Background}"
+                                        BorderBrush="{Binding BorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="8,3">
+                                    <TextBlock Text="{Binding DisplayName}"
+                                               Foreground="{Binding Foreground}"
+                                               FontSize="11"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center" />
+                                </Border>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Search Input -->
+                <DockPanel Margin="0,0,0,8">
+                    <TextBlock Text="{Binding SearchLabel}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,8,0" />
+                    <TextBox VerticalAlignment="Center"
+                             MinWidth="240"
+                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+            </StackPanel>
+
+            <TabControl DockPanel.Dock="Top" Margin="0,4,0,0">
+                <TabItem Header="{Binding InstalledTabHeader}"
+                         Visibility="{Binding InstalledTabVisibility}"
+                         IsSelected="{Binding IsInstalledTabSelected, Mode=TwoWay}">
+                    <DataGrid ItemsSource="{Binding GamesSetAsInstalled}"
+                              SelectionMode="Extended" SelectionUnit="FullRow"
+                              LoadingRow="OnGridLoadingRow"
+                              RowStyle="{StaticResource RowContextMenuStyle}"
+                              EnableRowVirtualization="True"
+                              VirtualizingPanel.IsVirtualizing="True"
+                              VirtualizingPanel.VirtualizationMode="Recycling"
+                              ScrollViewer.CanContentScroll="True"
+                              CanUserAddRows="False" AutoGenerateColumns="False" CanUserResizeRows="True" CanUserSortColumns="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{DynamicResource LOCInstallation_Status_Updater_StatusUpdateResultsWindowNameLabel}" Binding="{Binding Name}" IsReadOnly="True" />
+                            <DataGridTemplateColumn Header="{DynamicResource LOCInstallation_Status_Updater_StatusUpdateResultsWindowSourceLabel}"
+                                                    IsReadOnly="True"
+                                                    SortMemberPath="Source"
+                                                    Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{Binding SourceBadgeBackground}"
+                                                BorderBrush="{Binding SourceBadgeBorderBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="4"
+                                                Padding="7,2"
+                                                Margin="4,2"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Source}"
+                                                       Foreground="{Binding SourceBadgeForeground}"
+                                                       FontSize="11"
+                                                       FontWeight="SemiBold"
+                                                       VerticalAlignment="Center" />
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="{DynamicResource LOCInstallation_Status_Updater_StatusUpdateResultsWindowPlatformsLabel}" Binding="{Binding Platforms, Converter={StaticResource ListToStringConverter}}" IsReadOnly="True" />
+                            <DataGridTextColumn Header="{DynamicResource LOCInstallation_Status_Updater_StatusUpdateResultsWindowSizeLabel}" Binding="{Binding SizeDisplay}" IsReadOnly="True" Width="100" ElementStyle="{StaticResource SizeColumnTextStyle}" />
+                            <DataGridTextColumn Header="{DynamicResource LOCInstallation_Status_Updater_StatusUpdateResultsWindowReasonLabel}" Binding="{Binding Reason}" IsReadOnly="True" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+
+                <TabItem Header="{Binding UninstalledTabHeader}"
+                         Visibility="{Binding UninstalledTabVisibility}"
+                         IsSelected="{Binding IsUninstalledTabSelected, Mode=TwoWay}">
+                    <DataGrid ItemsSource="{Binding GamesSetAsUninstalled}"
+                              SelectionMode="Extended" SelectionUnit="FullRow"
+                              LoadingRow="OnGridLoadingRow"
+                              RowStyle="{StaticResource RowContextMenuStyle}"
+                              EnableRowVirtualization="True"
+                              VirtualizingPanel.IsVirtualizing="True"
+                              VirtualizingPanel.VirtualizationMode="Recycling"
+                              ScrollViewer.CanContentScroll="True"
+                              CanUserAddRows="False" AutoGenerateColumns="False" CanUserResizeRows="True" CanUserSortColumns="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{DynamicResource LOCInstallation_Status_Updater_StatusUpdateResultsWindowNameLabel}" Binding="{Binding Name}" IsReadOnly="True" />
+                            <DataGridTemplateColumn Header="{DynamicResource LOCInstallation_Status_Updater_StatusUpdateResultsWindowSourceLabel}"
+                                                    IsReadOnly="True"
+                                                    SortMemberPath="Source"
+                                                    Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{Binding SourceBadgeBackground}"
+                                                BorderBrush="{Binding SourceBadgeBorderBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="4"
+                                                Padding="7,2"
+                                                Margin="4,2"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Source}"
+                                                       Foreground="{Binding SourceBadgeForeground}"
+                                                       FontSize="11"
+                                                       FontWeight="SemiBold"
+                                                       VerticalAlignment="Center" />
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="{DynamicResource LOCInstallation_Status_Updater_StatusUpdateResultsWindowPlatformsLabel}" Binding="{Binding Platforms, Converter={StaticResource ListToStringConverter}}" IsReadOnly="True" />
+                            <DataGridTextColumn Header="{DynamicResource LOCInstallation_Status_Updater_StatusUpdateResultsWindowSizeLabel}" Binding="{Binding SizeDisplay}" IsReadOnly="True" Width="100" ElementStyle="{StaticResource SizeColumnTextStyle}" />
+                            <DataGridTextColumn Header="{DynamicResource LOCInstallation_Status_Updater_StatusUpdateResultsWindowReasonLabel}" Binding="{Binding Reason}" IsReadOnly="True" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+            </TabControl>
+        </DockPanel>
+    </Grid>
+</UserControl>

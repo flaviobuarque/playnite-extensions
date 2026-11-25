@@ -1,0 +1,317 @@
+<UserControl x:Class="InstallationStatusUpdater.Presentation.InstallationStatusUpdaterSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:pcmd="clr-namespace:PluginsCommon.Commands"
+             mc:Ignorable="d"
+             d:DesignHeight="650" d:DesignWidth="600">
+    <Grid Margin="20">
+        <DockPanel>
+            <TextBlock DockPanel.Dock="Top" VerticalAlignment="Center" Margin="0,0,0,15">
+                <Hyperlink NavigateUri="https://github.com/darklinkpower/PlayniteExtensionsCollection/wiki/Installation-Status-Updater"
+                           Command="{x:Static pcmd:GlobalCommands.NavigateUrlCommand}"
+                           CommandParameter="{Binding NavigateUri, RelativeSource={RelativeSource Self}}">
+                    <Run Text="{DynamicResource LOCInstallation_Status_Updater_SettingsHelpLabel}" />
+                </Hyperlink>
+            </TextBlock>
+
+            <TabControl>
+                <!-- ================= Detecção ================= -->
+                <TabItem Header="{DynamicResource LOCInstallation_Status_Updater_SettingsTabDetectionLabel}">
+                    <ScrollViewer Margin="10,15,10,10">
+                        <StackPanel>
+                            <TextBlock Text="{DynamicResource LOCInstallation_Status_Updater_SettingsTabDetectionDescription}"
+                                       TextWrapping="Wrap" Opacity="0.7" Margin="0,0,0,15" />
+                            <TextBlock Text="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSectionDetectionRules}" FontWeight="SemiBold" />
+                            <CheckBox Margin="0,10,0,0" IsChecked="{Binding Settings.OnlyUsePlayActionsForDetection}" Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingOnlyUsePlayActionGameActions}" />
+                            <CheckBox Margin="0,10,0,0" IsChecked="{Binding Settings.UrlActionIsInstalled}" Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingUrlActionIsInstalled}" />
+                            <CheckBox Margin="0,10,0,0" IsChecked="{Binding Settings.ScriptActionIsInstalled}" Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingScriptActionIsInstalled}" />
+                            <CheckBox Margin="0,10,0,0" IsChecked="{Binding Settings.DetectFilesFromLaunchArguments}" Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingDetectionDirsUsePathsInArgumentsLabel}" />
+                            <TextBlock Text="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingDetectionDirsUsePathsInArgumentsTooltip}"
+                                       Margin="30,5,0,0" TextWrapping="Wrap" Opacity="0.7"/>
+                            <CheckBox Margin="0,10,0,0" IsChecked="{Binding Settings.UseOnlyFirstRomDetection}" Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingUseOnlyFirstRomDetection}" />
+                            <CheckBox Margin="0,10,0,0" IsChecked="{Binding Settings.ScanGamesHandledByLibPlugins}" Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingScanLibraryGamesWithAction}" />
+                            <CheckBox Margin="0,10,0,0" IsChecked="{Binding Settings.ProtectDisconnectedDrives}" Content="{DynamicResource LOCInstallation_Status_Updater_SettingProtectDisconnectedDrivesLabel}" />
+                            <TextBlock Margin="30,5,0,0" TextWrapping="Wrap" Opacity="0.7" Text="{DynamicResource LOCInstallation_Status_Updater_SettingProtectDisconnectedDrivesTooltip}" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ================= Regra de tamanho mínimo ================= -->
+                <TabItem Header="{DynamicResource LOCInstallation_Status_Updater_SettingsTabMinimumSizeLabel}">
+                    <ScrollViewer Margin="10,15,10,10">
+                        <StackPanel>
+                            <TextBlock Text="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingMinimumFolderSizeDetectionTooltip}"
+                                       TextWrapping="Wrap" Opacity="0.7" Margin="0,0,0,15" />
+                            <CheckBox Name="CbUseMinimumFolderSizeDetection" IsChecked="{Binding Settings.UseMinimumFolderSizeDetection}" Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingUseMinimumFolderSizeDetection}" />
+                            <StackPanel IsEnabled="{Binding ElementName=CbUseMinimumFolderSizeDetection, Path=IsChecked}">
+                                <TextBlock Margin="0,15,0,0" Text="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingMinimumFolderSizeRulesLabel}" />
+                                <ListView Name="ListMinimumSizeRules" SelectionMode="Extended" Height="220" Margin="0,10,0,0"
+                                  ItemsSource="{Binding Settings.MinimumSizeRules}">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Width="Auto" Header="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingMinimumFolderSizeRulesLvEnabledLabel}">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <CheckBox IsChecked="{Binding Enabled}" />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Width="230" Header="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingMinimumFolderSizeRulesLvPlatformLabel}">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <ComboBox MinWidth="200"
+                                                          ItemsSource="{Binding DataContext.Platforms, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                          DisplayMemberPath="Name"
+                                                          SelectedValuePath="Id"
+                                                          SelectedValue="{Binding PlatformId}" />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Width="80" Header="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingMinimumFolderSizeRulesLvSizeLabel}">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBox Width="70" Text="{Binding SizeValue}" />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Width="70" Header="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingMinimumFolderSizeRulesLvUnitLabel}">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <ComboBox MinWidth="60"
+                                                          ItemsSource="{Binding DataContext.SizeUnits, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                          DisplayMemberPath="DisplayName"
+                                                          SelectedValuePath="Unit"
+                                                          SelectedValue="{Binding Unit}" />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingMinimumFolderSizeRulesAddLabel}" Margin="0,5,0,0" MinWidth="80"
+                                    Command="{Binding AddMinimumSizeRuleCommand}" />
+                                    <Button Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingMinimumFolderSizeRulesRemoveLabel}" Margin="5,5,0,0" MinWidth="80"
+                                    Command="{Binding RemoveMinimumSizeRulesCommand}" 
+                                    CommandParameter="{Binding SelectedItems, ElementName=ListMinimumSizeRules}"/>
+                                </StackPanel>
+
+                                <Separator Margin="0,25,0,0" />
+                                <TextBlock Margin="0,15,0,0" Text="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingMinimumFolderSizeExclusionsLabel}" FontWeight="SemiBold" />
+                                <TextBlock Margin="0,5,0,0" TextWrapping="Wrap" Opacity="0.7"
+                                           Text="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingMinimumFolderSizeExclusionsDescription}" />
+
+                                <TextBlock Margin="0,15,0,0" Text="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingMinimumFolderSizeExcludedGamesLabel}" />
+                                <TextBlock Margin="0,5,0,0" TextWrapping="Wrap" Opacity="0.7"
+                                           Text="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingMinimumFolderSizeExcludedGamesDescription}" />
+                                <ListView Name="ListExcludedGames" SelectionMode="Extended" Height="140" Margin="0,10,0,0"
+                                  ItemsSource="{Binding Settings.MinimumSizeRuleExcludedGames}">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Width="380" Header="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingMinimumFolderSizeExcludedGamesLvNameLabel}">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding GameName}" VerticalAlignment="Center" />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingMinimumFolderSizeExclusionsRemoveLabel}" Margin="0,5,0,0" MinWidth="80"
+                                    Command="{Binding RemoveMinimumSizeRuleExcludedGamesCommand}"
+                                    CommandParameter="{Binding SelectedItems, ElementName=ListExcludedGames}"/>
+                                </StackPanel>
+
+                                <TextBlock Margin="0,15,0,0" Text="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingMinimumFolderSizeExcludedSourcesLabel}" />
+                                <TextBlock Margin="0,5,0,0" TextWrapping="Wrap" Opacity="0.7"
+                                           Text="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingMinimumFolderSizeExcludedSourcesDescription}" />
+                                <DockPanel Margin="0,10,0,0">
+                                    <Button DockPanel.Dock="Right" Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingMinimumFolderSizeExclusionsAddLabel}" MinWidth="80" Margin="10,0,0,0"
+                                    Command="{Binding AddMinimumSizeRuleExcludedSourceCommand}" />
+                                    <!-- Editable so a source can be picked from the ones Playnite
+                                         actually has, or typed when it is not in the list. -->
+                                    <ComboBox VerticalAlignment="Center" MinWidth="240"
+                                              IsEditable="True" IsTextSearchEnabled="True"
+                                              ItemsSource="{Binding Sources}"
+                                              DisplayMemberPath="Name"
+                                              Text="{Binding NewExcludedSourceName, UpdateSourceTrigger=PropertyChanged}" />
+                                </DockPanel>
+                                <ListView Name="ListExcludedSources" SelectionMode="Extended" Height="110" Margin="0,10,0,0"
+                                  ItemsSource="{Binding Settings.MinimumSizeRuleExcludedSources}">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Width="380" Header="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingMinimumFolderSizeExcludedSourcesLvNameLabel}">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding}" VerticalAlignment="Center" />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingMinimumFolderSizeExclusionsRemoveLabel}" Margin="0,5,0,0" MinWidth="80"
+                                    Command="{Binding RemoveMinimumSizeRuleExcludedSourcesCommand}"
+                                    CommandParameter="{Binding SelectedItems, ElementName=ListExcludedSources}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ================= Verificação automática ================= -->
+                <TabItem Header="{DynamicResource LOCInstallation_Status_Updater_SettingsTabAutoScanLabel}">
+                    <ScrollViewer Margin="10,15,10,10">
+                        <StackPanel>
+                            <TextBlock Text="{DynamicResource LOCInstallation_Status_Updater_SettingsTabAutoScanDescription}"
+                                       TextWrapping="Wrap" Opacity="0.7" Margin="0,0,0,15" />
+                            <TextBlock Text="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSectionAutoScanTriggers}" FontWeight="SemiBold" />
+                            <CheckBox Margin="0,10,0,0" IsChecked="{Binding Settings.UpdateOnStartup}" Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingUpdateOnStartup}" />
+                            <CheckBox Margin="0,10,0,0" IsChecked="{Binding Settings.UpdateOnLibraryUpdate}" Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingUpdateOnLibraryUpdate}" />
+                            <CheckBox Margin="0,10,0,0" IsChecked="{Binding Settings.UpdateStatusOnUsbChanges}" Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingUpdateStatusOnUsbChanges}" />
+
+                            <CheckBox Name="CbUpdateOnDirChanges" Margin="0,10,0,0" IsChecked="{Binding Settings.UpdateStatusOnDirChanges}" Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingUpdateStatusOnDirChanges}" />
+                            <StackPanel IsEnabled="{Binding ElementName=CbUpdateOnDirChanges, Path=IsChecked}">
+                                <TextBlock Margin="0,10,0,0" Text="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingDetectionDirsLabel}" />
+                                <ListView Name="ListDetectionDirs" SelectionMode="Extended" Height="200" Margin="0,10,0,0"
+                                  ItemsSource="{Binding Settings.DetectionDirectories}">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Width="Auto" Header="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingDetectionDirsLvEnabledLabel}">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <CheckBox IsChecked="{Binding Enabled}" />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Width="Auto" Header="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingDetectionDirsLvScanSubdirsLabel}">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <CheckBox IsChecked="{Binding ScanSubDirs}" />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Width="250"  Header="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingDetectionDirsLvPathLabel}">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding DirectoryPath}" VerticalAlignment="Center"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingDetectionDirsAddLabel}" Margin="0,5,0,0" MinWidth="80"
+                                    Command="{Binding AddDetectionDirectoryCommand}" />
+                                    <Button Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingDetectionDirsRemoveLabel}" Margin="5,5,0,0" MinWidth="80"
+                                    Command="{Binding RemoveDetectionDirectoriesCommand}" 
+                                    CommandParameter="{Binding SelectedItems, ElementName=ListDetectionDirs}"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <Separator Margin="0,25,0,0" />
+                            <TextBlock Margin="0,15,0,0" Text="{DynamicResource LOCInstallation_Status_Updater_SettingsSectionDriveTagsLabel}" FontWeight="SemiBold" />
+                            <CheckBox Margin="0,10,0,0" IsChecked="{Binding Settings.UpdateLocTagsOnLibUpdate}" Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingUpdateLocTagsOnLibUpdate}" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ================= Resultados ================= -->
+                <TabItem Header="{DynamicResource LOCInstallation_Status_Updater_SettingsTabResultsLabel}">
+                    <ScrollViewer Margin="10,15,10,10">
+                        <StackPanel>
+                            <TextBlock Text="{DynamicResource LOCInstallation_Status_Updater_SettingsTabResultsDescription}"
+                                       TextWrapping="Wrap" Opacity="0.7" Margin="0,0,0,15" />
+                            <TextBlock Text="{DynamicResource LOCInstallation_Status_Updater_SettingsSectionApplyingResultsLabel}" FontWeight="SemiBold" />
+                            <CheckBox Margin="0,10,0,0" IsChecked="{Binding Settings.ConfirmStatusChangesBeforeApplying}" Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingConfirmStatusChangesBeforeApplying}" />
+                            <TextBlock Margin="0,10,0,0" Text="{DynamicResource LOCInstallation_Status_Updater_SettingsSectionScanNotificationsLabel}" FontWeight="SemiBold" />
+                            <CheckBox Margin="0,10,0,0" IsChecked="{Binding Settings.ShowNotificationOnAutomaticScans}" Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingShowAutoScanNotifications}" />
+                            <CheckBox Margin="0,10,0,0" IsChecked="{Binding Settings.ShowResultsWindowOnAutomaticScans}" Content="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingShowResultsWindowOnAutoScans}" />
+                            <TextBlock Margin="30,5,0,0" TextWrapping="Wrap" Opacity="0.7"
+                                       Text="{DynamicResource LOCInstallation_Status_Updater_StatusUpdaterSettingShowResultsWindowOnAutoScansTooltip}" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ================= Avançado ================= -->
+                <TabItem Header="{DynamicResource LOCInstallation_Status_Updater_SettingsTabAdvancedLabel}">
+                    <ScrollViewer Margin="10,15,10,10">
+                        <StackPanel>
+                            <TextBlock Text="{DynamicResource LOCInstallation_Status_Updater_SettingsTabAdvancedDescription}"
+                                       TextWrapping="Wrap" Opacity="0.7" Margin="0,0,0,15" />
+
+                            <TextBlock Text="{DynamicResource LOCInstallation_Status_Updater_SettingsSectionScopedScanLabel}" FontWeight="SemiBold" />
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <TextBlock Text="{DynamicResource LOCInstallation_Status_Updater_SettingsMaxScopedScanPathsLabel}"
+                                           VerticalAlignment="Center" Margin="0,0,10,0" />
+                                <TextBox Width="80" VerticalAlignment="Center"
+                                         Text="{Binding Settings.MaxScopedScanPaths}" />
+                            </StackPanel>
+                            <TextBlock Margin="0,5,0,0" TextWrapping="Wrap" Opacity="0.7"
+                                       Text="{DynamicResource LOCInstallation_Status_Updater_SettingsMaxScopedScanPathsTooltip}" />
+
+                            <Separator Margin="0,20,0,0" />
+                            <TextBlock Margin="0,15,0,0" Text="{DynamicResource LOCInstallation_Status_Updater_SettingsSectionDiskParallelismLabel}" FontWeight="SemiBold" />
+                            <TextBlock Margin="0,5,0,0" TextWrapping="Wrap" Opacity="0.7"
+                                       Text="{DynamicResource LOCInstallation_Status_Updater_SettingsSectionDiskParallelismDescription}" />
+
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <TextBlock Text="{DynamicResource LOCInstallation_Status_Updater_SettingsParallelismSolidStateLabel}"
+                                           VerticalAlignment="Center" Width="180" />
+                                <TextBox Width="80" VerticalAlignment="Center"
+                                         Text="{Binding Settings.ParallelismSolidState}" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                <TextBlock Text="{DynamicResource LOCInstallation_Status_Updater_SettingsParallelismMechanicalLabel}"
+                                           VerticalAlignment="Center" Width="180" />
+                                <TextBox Width="80" VerticalAlignment="Center"
+                                         Text="{Binding Settings.ParallelismMechanical}" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                <TextBlock Text="{DynamicResource LOCInstallation_Status_Updater_SettingsParallelismUnknownLabel}"
+                                           VerticalAlignment="Center" Width="180" />
+                                <TextBox Width="80" VerticalAlignment="Center"
+                                         Text="{Binding Settings.ParallelismUnknown}" />
+                            </StackPanel>
+
+                            <Separator Margin="0,20,0,0" />
+                            <TextBlock Margin="0,15,0,0" Text="{DynamicResource LOCInstallation_Status_Updater_SettingsDetectedDisksLabel}" FontWeight="SemiBold" />
+                            <TextBlock Margin="0,5,0,0" TextWrapping="Wrap" Opacity="0.7"
+                                       Text="{DynamicResource LOCInstallation_Status_Updater_SettingsDetectedDisksDescription}" />
+                            <ListView ItemsSource="{Binding DetectedDisks}" Height="150" Margin="0,10,0,0">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Width="150" Header="{DynamicResource LOCInstallation_Status_Updater_SettingsDetectedDisksLvRootLabel}">
+                                            <GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Root}" VerticalAlignment="Center" />
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                        <GridViewColumn Width="150" Header="{DynamicResource LOCInstallation_Status_Updater_SettingsDetectedDisksLvKindLabel}">
+                                            <GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding KindLabel}" VerticalAlignment="Center" />
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="{DynamicResource LOCInstallation_Status_Updater_SettingsRedetectDisksLabel}" Margin="0,5,0,0" MinWidth="140"
+                                Command="{Binding RedetectDisksCommand}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+        </DockPanel>
+    </Grid>
+</UserControl>
