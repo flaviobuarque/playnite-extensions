@@ -1,4 +1,4 @@
-﻿#Requires -Version 5.1
+#Requires -Version 5.1
 <#
 .SYNOPSIS
     Instalador Universal com Interface Gráfica (WPF Wizard) - Playnite Extensions & Themes.
