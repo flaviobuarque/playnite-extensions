@@ -145,7 +145,13 @@ function Load-CatalogItems([string]$scriptRoot) {
             AssetPattern     = [string]$r.assetPattern
             LocalThemeDir    = [string]$r.localThemeDir
             InstallSubdir    = [string]$r.installSubdir
+            DefaultSelected  = [bool]$r.defaultSelected
             Selected         = [bool]$r.defaultSelected
+            InstallStatus    = "NotInstalled"
+            StatusLabel      = "NÃO INSTALADO"
+            StatusBg         = "#1E293B"
+            StatusFg         = "#94A3B8"
+            ActionWord       = "Instalado"
         }
     }
     return $list
@@ -865,13 +871,103 @@ try {
     if ($script:LatestRelease -and $script:LatestRelease.tag_name) {
         $TxtReleaseTag.Text = "RELEASE $($script:LatestRelease.tag_name)"
         $ReleaseTagBadge.Visibility = "Visible"
+
+        # Atualiza versões exibidas dinamicamente a partir dos nomes dos .pext na release
+        foreach ($item in $script:Catalog) {
+            $asset = $script:LatestRelease.assets | Where-Object { $_.name -like $item.AssetPattern } | Select-Object -First 1
+            if ($asset -and $asset.name -match '_(\d+(?:_\d+)+)\.pext$') {
+                $item.Version = "v" + ($Matches[1] -replace '_', '.')
+            }
+        }
     }
 } catch {}
 
 $script:CurrentPage = 1
 $script:PathIsValid = $false
+$script:LastCheckedPlaynitePath = ""
 $script:WorkerTimer = $null
 $script:InstallSuccess = $true
+
+function Compare-SafeVersion([string]$v1, [string]$v2) {
+    $c1 = ($v1 -replace '^v', '' -replace '-.*$', '').Trim()
+    $c2 = ($v2 -replace '^v', '' -replace '-.*$', '').Trim()
+    try {
+        $ver1 = [Version]$c1
+        $ver2 = [Version]$c2
+        return $ver1.CompareTo($ver2)
+    } catch {
+        return [string]::Compare($c1, $c2, [System.StringComparison]::OrdinalIgnoreCase)
+    }
+}
+
+function Update-InstalledStatuses([string]$playniteDir) {
+    foreach ($item in $script:Catalog) {
+        $item.InstallStatus = "NotInstalled"
+        $item.StatusLabel = "NÃO INSTALADO"
+        $item.StatusBg = "#1E293B"
+        $item.StatusFg = "#94A3B8"
+        $item.ActionWord = "Instalado"
+        $item.Selected = [bool]$item.DefaultSelected
+
+        if (-not $playniteDir -or -not (Test-Path $playniteDir)) { continue }
+
+        $destDir = Join-Path $playniteDir $item.InstallSubdir
+        $catalogVerClean = ($item.Version -replace '^v', '').Trim()
+
+        if ($item.Type -like "*TEMA*") {
+            $themeYaml = Join-Path $destDir "theme.yaml"
+            if (Test-Path $themeYaml) {
+                $m = Select-String -Path $themeYaml -Pattern "^Version:\s*(.+)$" | Select-Object -First 1
+                $instVer = if ($m) { $m.Matches.Groups[1].Value.Trim() } else { "?" }
+                $tplFile = Join-Path $destDir "DerivedStyles\GridViewItemTemplate.xaml"
+                $hasMod = (Test-Path $tplFile) -and (Select-String -Path $tplFile -Pattern "ActiveRunningBadge" -Quiet)
+
+                if ($hasMod) {
+                    $cmp = Compare-SafeVersion $instVer $catalogVerClean
+                    if ($cmp -lt 0) {
+                        $item.InstallStatus = "Update"
+                        $item.StatusLabel = "ATUALIZAR (v$instVer → $($item.Version))"
+                        $item.StatusBg = "#122B40"; $item.StatusFg = "#38BDF8"
+                        $item.ActionWord = "Atualizado"
+                        $item.Selected = $true
+                    } else {
+                        $item.InstallStatus = "Installed"
+                        $item.StatusLabel = "JÁ INSTALADO (v$instVer-mod)"
+                        $item.StatusBg = "#0D2920"; $item.StatusFg = "#34D399"
+                        $item.ActionWord = "Reinstalado"
+                        $item.Selected = $false
+                    }
+                } else {
+                    $item.InstallStatus = "Update"
+                    $item.StatusLabel = "ORIGINAL DETECTADO - ATUALIZAR"
+                    $item.StatusBg = "#2D2212"; $item.StatusFg = "#FBBF24"
+                    $item.ActionWord = "Atualizado"
+                    $item.Selected = $true
+                }
+            }
+        } else {
+            $extYaml = Join-Path $destDir "extension.yaml"
+            if (Test-Path $extYaml) {
+                $m = Select-String -Path $extYaml -Pattern "^Version:\s*(.+)$" | Select-Object -First 1
+                $instVer = if ($m) { $m.Matches.Groups[1].Value.Trim() } else { "?" }
+                $cmp = Compare-SafeVersion $instVer $catalogVerClean
+                if ($cmp -lt 0) {
+                    $item.InstallStatus = "Update"
+                    $item.StatusLabel = "ATUALIZAR (v$instVer → $($item.Version))"
+                    $item.StatusBg = "#122B40"; $item.StatusFg = "#38BDF8"
+                    $item.ActionWord = "Atualizado"
+                    $item.Selected = $true
+                } else {
+                    $item.InstallStatus = "Installed"
+                    $item.StatusLabel = "JÁ INSTALADO (v$instVer)"
+                    $item.StatusBg = "#0D2920"; $item.StatusFg = "#34D399"
+                    $item.ActionWord = "Reinstalado"
+                    $item.Selected = $false
+                }
+            }
+        }
+    }
+}
 
 function Render-WelcomeCards {
     $WelcomeItemsControl.Items.Clear()
@@ -928,7 +1024,12 @@ function Render-WelcomeCards {
 function Update-SelectionSummary {
     $selectedCount = ($script:Catalog | Where-Object { $_.Selected }).Count
     $totalCount = $script:Catalog.Count
-    $TxtSelectSub.Text = "$selectedCount de $totalCount pacotes selecionados"
+    $allInstalled = ($script:Catalog | Where-Object { $_.InstallStatus -ne "Installed" }).Count -eq 0
+    if ($allInstalled -and $selectedCount -eq 0) {
+        $TxtSelectSub.Text = "Todos os $totalCount pacotes já estão instalados e atualizados (marque para reinstalar)"
+    } else {
+        $TxtSelectSub.Text = "$selectedCount de $totalCount pacotes selecionados"
+    }
     if ($script:CurrentPage -eq 3) {
         $BtnNext.IsEnabled = ($selectedCount -gt 0)
         $BtnNext.Content = if ($selectedCount -gt 0) { "Instalar ($selectedCount) →" } else { "Selecione ao menos 1" }
@@ -995,9 +1096,17 @@ function Render-SelectionCards {
         $vTxt.Text = $item.Version; $vTxt.FontSize = 9; $vTxt.FontWeight = "Bold"; $vTxt.Foreground = Get-Brush "#34D399"
         $verBadge.Child = $vTxt
 
+        $statusBadge = New-Object System.Windows.Controls.Border
+        $statusBadge.Background = Get-Brush $item.StatusBg; $statusBadge.CornerRadius = New-Object System.Windows.CornerRadius(4)
+        $statusBadge.Padding = New-Object System.Windows.Thickness(6,2,6,2); $statusBadge.Margin = New-Object System.Windows.Thickness(6,0,0,0)
+        $sTxt = New-Object System.Windows.Controls.TextBlock
+        $sTxt.Text = $item.StatusLabel; $sTxt.FontSize = 9; $sTxt.FontWeight = "Bold"; $sTxt.Foreground = Get-Brush $item.StatusFg
+        $statusBadge.Child = $sTxt
+
         $topRow.Children.Add($nameLbl) | Out-Null
         $topRow.Children.Add($typeBadge) | Out-Null
         $topRow.Children.Add($verBadge) | Out-Null
+        $topRow.Children.Add($statusBadge) | Out-Null
 
         $descLbl = New-Object System.Windows.Controls.TextBlock
         $descLbl.Text = $item.Short; $descLbl.FontSize = 11.5; $descLbl.Foreground = Get-Brush "#94A3B8"
@@ -1279,7 +1388,16 @@ function Go-ToPage([int]$page) {
     switch ($page) {
         1 { $BtnNext.Content = "Avançar →" }
         2 { $BtnNext.Content = "Avançar →"; Update-PlayniteValidation }
-        3 { Update-SelectionSummary }
+        3 {
+            $curPath = $TxtPlaynitePath.Text.Trim()
+            if ($script:LastCheckedPlaynitePath -ne $curPath) {
+                $script:LastCheckedPlaynitePath = $curPath
+                Update-InstalledStatuses $curPath
+                Render-SelectionCards
+            } else {
+                Update-SelectionSummary
+            }
+        }
         4 {
             $BtnNext.Content = "Instalando..."
             $BtnNext.IsEnabled = $false
@@ -1325,7 +1443,7 @@ function Build-Summary {
             $badge = New-VectorIconBadge $item.IconPath $item.Accent $item.IconBg 24
             $badge.Margin = New-Object System.Windows.Thickness(0,0,10,0)
             $txt = New-Object System.Windows.Controls.TextBlock
-            $txt.Text = "$($item.Name) ($($item.Version)) — Instalado"
+            $txt.Text = "$($item.Name) ($($item.Version)) - $($item.ActionWord)"
             $txt.FontSize = 12.5; $txt.Foreground = Get-Brush "#A7F3D0"; $txt.VerticalAlignment = "Center"
             $row.Children.Add($badge) | Out-Null
             $row.Children.Add($txt) | Out-Null
